@@ -12,17 +12,20 @@ const requestListener = (request, response) => {
   }
 
   if(method === 'POST') {
-    response.end('<h1>Hai!</h1>');
-  }
+    let body = [];
 
-  if(method === 'PUT') {
-    response.end('<h1>Bonjour!</h1>');
-  }
+    // to retrieve the request
+    request.on('data', (chunk) => {
+      body.push(chunk);
+    });
 
-  if(method === 'DELETE') {
-    response.end('<h1>Salam!</h1>');
+    // cast the request then store it to body
+    request.on('end', () => {
+      body = Buffer.concat(body).toString();
+      const { name } = JSON.parse(body); // to cast the json string to js object 
+      response.end(`<h1>Hai, ${name}!</h1>`);
+    });
   }
-
 };
 
 const server = http.createServer(requestListener);
