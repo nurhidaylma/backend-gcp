@@ -5,26 +5,38 @@ const requestListener = (request, response) => {
 
   response.statusCode = 200;
 
-  const { method } = request;
+  const { url, method } = request;
 
-  if(method === 'GET') {
-    response.end('<h1>Hello!</h1>');
-  }
+  if (url === '/') {
+    if(method === 'GET') {
+      response.end('<h1>Ini adalah homepage</h1>');
+    }
 
-  if(method === 'POST') {
-    let body = [];
+    response.end(`<h1>Halaman tidak dapat diakses dengan method ${method} </h1>`);
+  } 
+  else if (url === '/about') {
+    if (method === 'GET') {
+      response.end('Halo! Ini adalah halaman about');
+    } 
+    else if(method === 'POST') {
+      let body = [];
 
-    // to retrieve the request
-    request.on('data', (chunk) => {
-      body.push(chunk);
-    });
+      // to retrieve the request
+      request.on('data', (chunk) => {
+        body.push(chunk);
+      });
 
-    // cast the request then store it to body
-    request.on('end', () => {
-      body = Buffer.concat(body).toString();
-      const { name } = JSON.parse(body); // to cast the json string to js object 
-      response.end(`<h1>Hai, ${name}!</h1>`);
-    });
+      // cast the request then store it to body
+      request.on('end', () => {
+        body = Buffer.concat(body).toString();
+        const { name } = JSON.parse(body); // to cast the json string to js object 
+        response.end(`<h1>Hai, ${name}! Ini adalah halaman about</h1>`);
+      });
+    } else {
+      response.end(`Halaman tidak bisa diakses menggunakan method ${method}`);
+    }
+  } else {
+    response.end('<h1>Halaman tidak ditemukan</h1>');
   }
 };
 
